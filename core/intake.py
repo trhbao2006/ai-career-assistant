@@ -3,8 +3,11 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Optional
 
+from pathlib import Path
+from typing import Union
+import pymupdf
 
-"""CLEAN TEXT"""
+"""TASK 1: CLEAN TEXT"""
 @dataclass
 class IntakeResult: 
     """Kết quả sau khi upload CV"""
@@ -44,10 +47,87 @@ def clean_raw_text(raw_text: str) -> str:
 
     return text.strip()
 
+"""TASK 2: """
+def extract_cv(pdf_source: Union[str, Path, bytes]) -> IntakeResult:
+    doc = None
+    try:
+        if isinstance(pdf_source, bytes):
+            doc = pymupdf.open(stream=pdf_source, filetype="pdf")
+        elif isinstance(pdf_source, (str, Path)):
+            doc = pymupdf.open(str(pdf_source))
+        else:
+            raise TypeError(f"Định dạng nguồn không hỗ trợ: {type(pdf_source)}")
+
+        if doc.page_count <= 0 or doc.page_count > 5 :
+            return IntakeResult(
+                is_valid=False,
+                clean_text="",
+                char_count=0,
+                page_count=doc.page_count,
+                error_message=f"Số trang không hợp lệ ({doc.page_count} trang). CV phải từ 1 đến 5 trang."
+            )
+
+        # Đọc nội dung từng trang
+        raw_text_parts = []
+        for page in doc:
+            raw_text_parts.append(page.get_text("text", sort=True))
+        raw_text = "".join(raw_text_parts)
+
+        # Làm sạch
+        cleaned = clean_raw_text(raw_text)
+
+        if not cleaned:
+            return IntakeResult(
+                is_valid=False,
+                clean_text="",
+                char_count=0,
+                page_count=doc.page_count,
+                error_message="File PDF không chứa văn bản có thể trích xuất (có thể là file scan hoặc ảnh)"
+            )
+
+        return IntakeResult(
+            is_valid=True,
+            clean_text=cleaned,
+            char_count=len(cleaned),
+            page_count=doc.page_count
+        )
+
+    except FileNotFoundError:
+        return IntakeResult(
+            is_valid=False,
+            clean_text="",
+            char_count=0,
+            page_count=0,
+            error_message="Không tìm thấy file theo đường dẫn được cung cấp."
+        )
+
+    except pymupdf.FileDataError:
+        return IntakeResult(
+            is_valid=False,
+            clean_text="",
+            char_count=0,
+            page_count=0,
+            error_message="File PDF bị hỏng hoặc định dạng không hợp lệ"
+        )
+
+    except Exception as e:
+        return IntakeResult(
+            is_valid=False,
+            clean_text="",
+            char_count=0,
+            page_count=0,
+            error_message=f"Lỗi không xác định khi đọc PDF: {str(e)}"
+        )
 
 if __name__ == "__main__":
-    dirty_sample = "  Họ và tên:\xa0\xa0Trần Văn A \u200b\r\n\r\n\r\n\uf0b7 Kỹ năng: Proﬁcient in   Python\t\t& C++   "
-    cleaned = clean_raw_text(dirty_sample)
-    print(repr(cleaned))
+    test_pdf_path = "test/sample_cv.pdf"  # Đổi thành đường dẫn file PDF của bạn
+    result = extract_cv(test_pdf_path)
 
-
+    print("--- KẾT QUẢ INTAKE ---")
+    print(f"Hợp lệ: {result.is_valid}")
+    print(f"Số trang: {result.page_count}")
+    print(f"Tổng số ký tự: {result.char_count}")
+    if result.error_message:
+        print(f"Lỗi: {result.error_message}")
+    else:
+        print(f"1000 ký tự đầu:\n{result.clean_text[:1000]}")
