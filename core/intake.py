@@ -118,16 +118,3 @@ def extract_cv(pdf_source: Union[str, Path, bytes]) -> IntakeResult:
             page_count=0,
             error_message=f"Lỗi không xác định khi đọc PDF: {str(e)}"
         )
-
-if __name__ == "__main__":
-    test_pdf_path = "test/sample_cv.pdf"  # Đổi thành đường dẫn file PDF của bạn
-    result = extract_cv(test_pdf_path)
-
-    print("--- KẾT QUẢ INTAKE ---")
-    print(f"Hợp lệ: {result.is_valid}")
-    print(f"Số trang: {result.page_count}")
-    print(f"Tổng số ký tự: {result.char_count}")
-    if result.error_message:
-        print(f"Lỗi: {result.error_message}")
-    else:
-        print(f"1000 ký tự đầu:\n{result.clean_text[:1000]}")
