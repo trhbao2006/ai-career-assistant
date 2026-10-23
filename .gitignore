@@ -2,4 +2,4 @@ venv/
 __pycache__/
 *.pyc
 .env
-tests/sample_cv.pdf
+test/sample_cv.pdf

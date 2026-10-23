@@ -41,7 +41,7 @@ SECTION_PATTERNS: Dict[str, re.Pattern] = {
 }
 
 def detect_section_header(line: str) -> Optional[str]:
-    """Kiểm tra xem một dòng có phải là tiêu đề section hay không."""
+    #Kiểm tra xem một dòng có phải là tiêu đề section hay không
     clean_line = line.strip()
 
     #line rỗng hoặc vượt 40 kí tự
@@ -59,7 +59,7 @@ def detect_section_header(line: str) -> Optional[str]:
 
     return None
 
-"""Phân tách nội dung CV thành từng section"""
+# Thực hiện phân tách
 def parse_cv_sections(clean_text: str) -> Dict[str, str]:
     sections = {name: [] for name in SECTION_NAMES}
     current_section = "contact"
