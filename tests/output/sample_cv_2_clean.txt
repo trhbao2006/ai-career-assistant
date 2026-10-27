@@ -1,0 +1,72 @@
+Trần Văn A
+
+Full-stack developer
+
+Tôi mong muốn phát triển sự nghiệp với vai trò full stack developer, nơi tôi
+có thể vận dụng cả kỹ năng backend và frontend để xây dựng sản phẩm
+hiệu quả, ổn định và dễ mở rộng. Đồng thời không ngừng học thêm về kiến
+trúc hệ thống và DevOps.
+
+THÔNG TIN CÁ NHÂN HỌC VẤN
+
+📞 0123456789 Trường Đại học Kỹ thuật Sáng Tạo (CreativeTech University)
+✉ trhbao.thb@gmail.com Cử nhân Công nghệ Thông tin ( 2017 - 2021 )
+ Hà Nội
+- Chuyên ngành: Phát triển phần mềm
+- GPA: 3.3 / 4.0  22/02/1999
+- Đồ án tốt nghiệp: Xâydựnghệthốngwebquảnlýkhohàngbằng
+MERNStack(MongoDB,Express.js,React,Node.js)
+
+KINH NGHIỆM LÀM VIỆC KỸ NĂNG
+
+NextCore Technologies JavaScript (ES6+), TypeScript
+
+Full Stack Developer ( 08/2022 - Nay ) HTML5, CSS3, SCSS
+- Phát triển và bảo trì hệ thống quản lý kho vận cho doanh nghiệp vừa và SQL, NoSQL (MySQL, MongoDB)
+nhỏ, sử dụng React (TypeScript) ở frontend và Node.js + MongoDB ở
+ReactJS, React Hooks, Context API
+backend.
+Next.js (cơ bản), TailwindCSS, - Thiết kế và triển khai các RESTful API có xác thực bằng JWT, phân quyền
+Material UI theo vai trò.
+- Tối ưu hiệu suất hệ thống, rút ngắn thời gian phản hồi API trung bình từ JWT Authentication, Role-based
+900ms xuống còn 250ms. access
+- Tham gia quy trình CI/CD với GitHub Actions, viết unit test bằng Jest cho Git, GitHub / GitLab, Git flow
+cả frontend và backend.
+Docker (cơ bản), CI/CD với GitHub
+- Hỗ trợ hướng dẫn thực tập sinh và viết tài liệu kỹ thuật cho team.
+Actions
+Techland Digital
+Node.js, Express.js, RESTful API
+Full Stack Developer ( 07/2020 - 07/2022 )
+- Phối hợp với team 4 người xây dựng website booking homestay đa nền CHỨNG CHỈ
+tảng, dùng ReactJS, Node.js, MySQL.
+- Xử lý phần frontend responsive, kết nối API, thực hiện kiểm thử chức năng Udemy 2023
+bằng Postman.
+The Complete Node.js Developer
+- Làm việc với Docker để đóng gói môi trường dev, hỗ trợ deploy lên server
+Course
+nội bộ.
+Udemy 2023 - Tham gia họp sprint theo mô hình Agile, sử dụng Jira để quản lý task.
+React – The Complete Guide (incl.
+CodeNest Studio
+Hooks, Redux, Router) Intern Web Developer ( 01/2020 - 05/2020 )
+NGƯỜI GIỚI THIỆU - Học và tham gia làm landing page bằng HTML/CSS/JS, sau đó tích hợp
+React căn bản.
+Nguyễn Văn Trí
+- Thực hành viết API đơn giản với Express và MongoDB.
+Chức vụ: Senior Full Stack
+- Làm quen quy trình teamwork và Git (git flow).
+Developer
+HOẠT ĐỘNG Công ty: NextCore Technologies
+Mối quan hệ: Trưởng nhóm trực tiếp
+Hệ thống quản lý kho vận – NextCore Technologies (2022–nay) trong dự án quản lý kho vận
+Full stack developer ( 2022 - Nay ) Email: tri.nguyen@nextcore.vn
+
+- Full stack dev chính cho hệ thống quản lý nhập – xuất – tồn kho cho doanh
+nghiệp vừa DANH HIỆU VÀ GIẢI THƯỞNG
+- Frontend: React + TypeScript, thiết kế giao diện responsive với
+TailwindCSS NextCore Technologies
+- Backend: Node.js + Express + MongoDB, xây dựng hệ thống API và phân Nhân viên xuất sắc quý II/2023
+quyền bằng JWT
+- Tối ưu hiệu suất API, rút ngắn thời gian phản hồi từ ~900ms → ~250ms
+- Tích hợp CI/CD với GitHub Actions, viết unit test bằng Jest © topcv.vn

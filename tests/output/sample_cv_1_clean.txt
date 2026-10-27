@@ -1,0 +1,91 @@
+Chicago, IL - dataanalyst@gmail.com - +1 3122-2222Priya Shah Data Analyst
+
+PROFILE SUMMARY
+
+Data Analyst with 6 years of experience designing and operating business analytics platforms across marketplace
+operations, podcast growth, and consumer subscriptions, specializing in KPI design, A/B test readouts, and executive-
+facing data storytelling.
+
+Solid technical background across warehouses (Snowflake, BigQuery), BI tools (Tableau, Looker), languages (SQL,
+Python), statistics (R), and notebooks (Hex) with strong fundamentals in experiment design, causal reasoning, and
+dimensional modeling.
+
+Deep expertise in KPI ownership, experimentation rigor, self-service data culture, and executive-facing storytelling,
+leveraging methodologies such as weekly business reviews and A/B test readouts to drive actionable, well-documented,
+and trustworthy analytics.
+
+Engaged collaborator working cross-functionally with Product, Operations, and Finance teams in Agile environments,
+contributing to leadership reviews, launch postmortems, and metric-definition workshops with a pragmatic, ownership-first
+mindset.
+
+Emerging leader who shares technical excellence and fosters a culture of metric integrity and documentation discipline
+through PR reviews and runbooks, while leading analytics guild sessions and authoring widely adopted SQL-and-dashboard
+templates.
+
+TECHNICAL SKILLS
+
+Data Warehouses: Snowflake, BigQuery, Redshift, Databricks
+
+BI & Visualization: Tableau, Looker, Mode, Power BI, Metabase
+
+Languages & Querying: SQL, Python (pandas, NumPy), R, Bash
+
+Statistics & Experimentation: A/B testing, CUPED, statsmodels, SciPy, causal inference
+
+Modeling & Semantic Layer: dbt, LookML, dimensional modeling, metric layer
+
+ETL & Pipelines: Airflow, Fivetran, Hightouch, dbt Cloud
+
+Notebooks & Discovery: Hex, Jupyter, Deepnote, Quarto
+
+Communication & Executive briefings, board materials, RFCs, Atlan, Notion
+Documentation:
+
+EDUCATION
+
+Northwestern University B.S. in Statistics Evanston, IL - Sep 2016 - Jun 2020
+
+WORK EXPERIENCE
+
+DoorDash Senior Data Analyst Chicago, IL - Sep 2022 - Present
+
+Lead business analytics for the DoorDash Marketplace team, supporting 35M+ active consumers and framing high-stakes
+questions across launch evaluation, funnel optimization, and market expansion for 8 product surfaces in partnership with
+Product, Operations, and Finance leadership.
+
+Wrote production-grade SQL on Snowflake powering 180+ recurring queries, refactoring slow joins around window
+functions, CTEs, and incremental dbt materializations to cut average runtime from 48s to 6s and unblock real-time
+stakeholder reporting.
+
+Built and maintained 22 Tableau and Looker dashboards for executive, product, and ops audiences, layering drill-down
+filters, derived calculations, and explainer tooltips that reached 1,400+ weekly active users and lifted self-service adoption from 38% to 72%.
+
+Defined and documented 24 core business metrics including DAU/MAU, retention curves, and GOV composition, governed
+through a dbt metric layer and a company-wide data dictionary, cutting cross-team metric drift across 4 leadership reviews
+per quarter.
+
+Led 8 deep-dive analyses on top-of-funnel anomalies including a 22% drop in iOS new-user activation, isolating the cause
+to a routing-flag regression through cohort comparisons and shipping a fix that recovered $1.8M in projected ARR.
+
+Supported 31 A/B tests for the Pricing and Subscription teams, designing experiment power and stratification, applying
+CUPED variance reduction, and producing causal readouts that gated 9 experiment-driven launches without false-positive
+shipped wins.
+
+Authored 48 strategic narratives including board pre-reads, launch postmortems, and quarterly business retrospectives for
+executive leadership, translating cohort and funnel data into recommendations that shaped 3 multi-quarter strategic bets.
+
+Spotify Data Analyst New York, NY - Jul 2019 - Aug 2022
+
+Profiled 120+ datasets across the Streaming Insights warehouse, hunting for distribution skews, null-rate spikes, and
+schema drift, and surfaced 15 upstream data-quality issues that blocked downstream model training.
+
+Owned weekly and monthly reporting for the Podcast Growth team, covering listener cohort retention, show-level
+engagement, and creator-tier conversion across 120+ recurring reports that anchored the team's planning rituals over 2
+years.
+
+Built the team's self-service enablement program around metric definitions, column-level lineage in Atlan, and weekly
+stakeholder office hours, cutting analyst-on-call requests by 62% and lifting stakeholder NPS from 34 to 78.
+
+Worked closely with Product, Marketing, and Operations teams across 4 product surfaces to negotiate metric definitions,
+launch quality bars, and dashboard ownership, authoring 6 analytics RFCs that shaped the org's data culture and
+onboarded 8 new analysts.

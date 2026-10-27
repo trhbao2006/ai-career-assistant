@@ -1,0 +1,79 @@
+KINH NGHIỆM LÀM VIỆC Bảo Trần
+
+CoreStack Solutions 08/2021 - Nay Back-end developer
+BACK-END DEVELOPER
+
+- Phát triển hệ thống quản lý đơn hàng cho sàn thương mại
+điện tử, sử dụng Node.js, Express.js và MongoDB, xử lý
+trung bình 10.000 request/ngày.
+- Thiết kế và triển khai RESTful API, có kiểm thử bằng
+Postman và Jest, tích hợp CI/CD với GitLab CI.
+- Tối ưu hiệu suất API và truy vấn DB, giúp giảm thời gian phản
+hồi xuống còn dưới 200ms.
+- Tích hợp hệ thống thanh toán qua các cổng như MoMo,
+VNPAY, hỗ trợ xử lý giao dịch song song thông qua Redis
+Queue.
+- Tham gia viết tài liệu kỹ thuật (API spec, flow xử lý) và hỗ trợ
+frontend team trong việc kết nối dữ liệu.
+
+THÔNG TIN CÁ NHÂN
+Bitverse Technologies 06/2019 - 07/2021
+M 0123456789 JUNIOR BACK-END DEVELOPER
+📅 30/12/1997 - Tham gia phát triển back-end cho ứng dụng tài chính cá
+nhân, sử dụng Node.js, TypeScript, MySQL.
+@ trhbao.thb@gmail.com - Xây dựng hệ thống phân quyền người dùng với JWT và cơ
+chế refresh token. Hà Nội
+- Làm việc chặt chẽ với frontend để thiết kế cấu trúc API phù
+hợp với giao diện React.
+MỤC TIÊU NGHỀ NGHIỆP - Viết các cronjob tự động nhắc thanh toán định kỳ và kiểm
+tra trạng thái tài khoản.
+Tôi đang tìm kiếm một môi trường ổn định - Học và áp dụng các nguyên tắc clean code, tách logic
+để phát triển chuyên môn back-end, đặc thành các service độc lập.
+biệt là với Node.js, database và API. Mong
+muốn đóng góp vào những sản phẩm có tính
+NovaSoft Labs 01/2019 - 05/2019ứng dụng cao.
+INTERN BACK-END DEVELOPER
+KỸ NĂNG - Học và hỗ trợ viết các API đơn giản với Node.js và Express.
+- Làm quen với quy trình làm việc theo Agile và sử dụng Git,
+NGÔN NGỮ LẬP TRÌNH Trello.
+Node.js, JavaScript, TypeScript, Python, - Tham gia viết log, xử lý lỗi cơ bản và đọc log server cùng
+Java team.
+
+FRAMEWORK & RUNTIME
+Express.js, NestJS, Spring Boot HỌC VẤN
+
+CƠ SỞ DỮ LIỆU
+Trường Đại học Công nghệ Đông Á (East Asia University of
+PostgreSQL, MySQL, MongoDB, Redis Technology)
+API 2015 - 2019
+RESTful API, GraphQL, WebSocket Kỹ thuật phần mềm
+DEVOPS CƠ BẢN - Chuyên ngành: Kỹ thuật phần mềm
+Docker, Nginx, PM2 - GPA: 3.3 / 4.0
+- Đồ án tốt nghiệp: XâydựnghệthốngquảnlýkhohàngsửAUTHENTICATION
+dụngNode.jsvàMongoDB
+JWT, OAuth2
+
+TESTING
+CHỨNG CHỈ
+Jest, Mocha, PostmanVERSION CONTROL MongoDB University 2021
+MongoDB for DevelopersGit, GitHub / GitLab
+
+MONITORING & LOGGING
+IBM 2021
+Logstash, Grafana, Prometheus (cơ bản) Docker Essentials
+
+NGƯỜI GIỚI THIỆU Udemy 2020
+Node.js – The Complete Guide (MVC, REST APIs, GraphQL,
+Phạm Quốc Huy Deno)
+Chức vụ: Senior Back-End Developer
+Công ty: CoreStack Solutions DANH HIỆU VÀ GIẢI THƯỞNG
+Mối quan hệ: Trưởng nhóm trực tiếp trong
+dự án xây dựng hệ thống quản lý đơn hàng CoreStack Solutions 2023
+Email: huy.pham@corestack.vn Nhân viên kỹ thuật tiêu biểu quý III/2023
+
+Bitverse Technologies 2022
+SỞ THÍCH Giải Nhì cuộc thi Code Challenge nội bộ 2022
+
+Đọc sách, xem phim
+
+© topcv.vn
