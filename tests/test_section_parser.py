@@ -1,6 +1,11 @@
+import sys
 from pathlib import Path
 from core.intake import extract_cv
 from core.section_parser import parse_cv_sections
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 def test_stage2_samples():
     base_dir = Path("tests/backend")

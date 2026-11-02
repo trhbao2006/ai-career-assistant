@@ -17,8 +17,13 @@ class ATSScoreResult:
     archetype: str                          # Mô hình công ty mục tiêu
     breakdown: Dict[str, float]             # Điểm chi tiết từng trụ cột
     missing_skills: Dict[str, List[str]]    # Các kỹ năng quan trọng còn thiếu (Skill Gap)
-    unlisted_Project_skills: List[str]      # Kỹ năng có làm trong đồ án nhưng quên ghi vào mục Skills (Implicit)
+    unlisted_project_skills: List[str]      # Kỹ năng có làm trong đồ án nhưng quên ghi vào mục Skills (Implicit)
     actionable_feedback: List[str]          # Các lời khuyên sửa CV cụ thể
+
+    @property
+    def unlisted_Project_skills(self) -> List[str]:
+        """Tương thích ngược với định dạng cũ."""
+        return self.unlisted_project_skills
 
 
 # Trụ cột 1: Độ hoàn thiện cấu trúc CV (Tối đa 20 điểm)
@@ -61,7 +66,7 @@ def score_skill_coverage(
     weights = COMPANY_ARCHETYPES.get(archetype_key, COMPANY_ARCHETYPES["product"])
     core_reqs = ARCHETYPE_CORE_SKILLS.get(archetype_key, ARCHETYPE_CORE_SKILLS["product"])
 
-    # Nếu người dùng có upload thêm JD (học từ ý tưởng app.py nhưng dùng Regex chuẩn của Chặng 3)
+    # Nếu người dùng có upload thêm JD, bóc tách kỹ năng từ JD
     jd_skills = extract_skills(jd_text) if jd_text else {}
 
     score = 0.0
@@ -80,18 +85,35 @@ def score_skill_coverage(
     for category, weight in weights.items():
         found_set = set(all_found_skills.get(category, []))
 
-        # Xác định tập kỹ năng mục tiêu cần kiểm tra Skill Gap
+        # TH1: Có JD text và JD yêu cầu kỹ năng ở nhóm này
         if jd_text and jd_skills.get(category):
             target_set = set(jd_skills[category])
             expected_num = len(target_set)
+            missing = sorted(list(target_set - found_set))
+            if missing:
+                missing_skills[category] = missing
+
+        # TH2: Chấm theo Archetype chuẩn (hoặc nhóm không có trong JD)
         else:
             target_set = set(core_reqs.get(category, []))
             expected_num = TARGET_COUNT.get(category, 2)
 
-        # Tính Skill Gap bằng phép hiệu tập hợp (Set Difference)
-        missing = sorted(list(target_set - found_set))
-        if missing:
-            missing_skills[category] = missing
+            if category == "languages":
+                # Đối với Fresher/Intern, không ép buộc phải biết toàn bộ các ngôn ngữ khác nhau
+                core_matched = found_set & target_set
+                if not core_matched:
+                    # Chưa có ngôn ngữ cốt lõi nào trong định hướng archetype
+                    missing_skills[category] = sorted(list(target_set))
+                elif len(found_set) < expected_num:
+                    # Đã có 1 ngôn ngữ core nhưng chưa đủ chỉ tiêu kỳ vọng (ví dụ cần 2)
+                    remaining = sorted(list(target_set - found_set))
+                    if remaining:
+                        missing_skills[category] = remaining[:2]
+            else:
+                # Các nhóm khác: nếu chưa đạt đủ số lượng kỳ vọng, cảnh báo các core skills còn thiếu
+                missing = sorted(list(target_set - found_set))
+                if missing and len(found_set) < expected_num:
+                    missing_skills[category] = missing
 
         # Tính tỷ lệ phủ kỹ năng của nhóm này
         if expected_num > 0:
@@ -119,8 +141,7 @@ def score_impact_and_metrics(sections: Dict[str, str]) -> Tuple[float, List[str]
     if not exp_proj_text:
         return 0.0, ["Không có nội dung Dự án/Kinh nghiệm để chấm mức độ tác động (Impact)."]
 
-    # uét số liệu đo lường kết quả (Tối đa 15 điểm)
-    # Bắt: 30%, 200ms, 900ms -> 250ms, 10.000 request/ngày, 500+ users, 2x...
+    # 1. Quét số liệu đo lường kết quả (Tối đa 15 điểm)
     metrics_pattern = re.compile(
         r"(\d+([.,]\d+)?\s*(%|ms|s|giây|request|req|rps|tps|users|người dùng|x\b)|giảm\s+\d+|tăng\s+\d+|rút ngắn)",
         re.IGNORECASE,
@@ -164,11 +185,12 @@ def score_presentation_and_consistency(
     score = 0.0
     feedback = []
 
-    full_contact = f"{sections.get('contact', '')}\n{sections.get('summary', '')}"
+    # Quét link profile trong contact, summary và cả projects (nhiều bạn để link repo tại mục dự án)
+    search_text = f"{sections.get('contact', '')}\n{sections.get('summary', '')}\n{sections.get('projects', '')}"
 
     # 1. Kiểm tra link GitHub / Portfolio / LinkedIn (5 điểm)
     has_profile_link = bool(
-        re.search(r"(github\.com|gitlab\.com|linkedin\.com)", full_contact, re.IGNORECASE)
+        re.search(r"(github\.com|gitlab\.com|linkedin\.com)", search_text, re.IGNORECASE)
     )
     if has_profile_link:
         score += 5.0
@@ -214,7 +236,7 @@ def evaluate_cv_ats(
 
     total_score = round(s_struct + s_skill + s_impact + s_pres, 1)
 
-    # Phân hạng ngưỡng đánh giá (học từ cấu trúc phân loại của app.py)
+    # Phân hạng ngưỡng đánh giá
     if total_score >= 80:
         match_level = "Excellent Match"
     elif total_score >= 60:
@@ -235,6 +257,6 @@ def evaluate_cv_ats(
             "presentation_and_links": s_pres,     # /15
         },
         missing_skills=missing_skills,
-        unlisted_Project_skills=unlisted_skills,
+        unlisted_project_skills=unlisted_skills,
         actionable_feedback=all_feedback,
     )

@@ -20,11 +20,11 @@ Tuyển dụng Backend Developer (Fresher/Junior):
 
 def test_stage4_samples():
     base_dir = Path("tests/backend") if Path("tests/backend").exists() else Path("test/backend")
-    sample_files = [base_dir / f"sample_cv_{i}.pdf" for i in range(1, 4)]
+    sample_files = [base_dir / f"sample_cv_{i}.pdf" for i in range(1, 5)]
 
-    print("=" * 70)
-    print("   KIỂM TRA CHẶNG 4: ĐA MÔ HÌNH (ARCHETYPES) & SO KHỚP JD")
-    print("=" * 70)
+    print("=" * 75)
+    print("      KIỂM TRA CHẶNG 4: ĐA MÔ HÌNH (ARCHETYPES) & SO KHỚP TRỰC TIẾP JD")
+    print("=" * 75)
 
     for pdf_path in sample_files:
         if not pdf_path.exists():
@@ -40,9 +40,10 @@ def test_stage4_samples():
         skills = analyze_cv_skills(sections)
 
         print(f"\n📄 FILE: {pdf_path.name}")
-        print("-" * 70)
+        print("-" * 75)
 
         # A. Chấm điểm lần lượt với 3 Archetypes
+        product_res = None
         for arch in ["product", "outsourcing", "startup"]:
             res = evaluate_cv_ats(
                 sections=sections,
@@ -51,12 +52,22 @@ def test_stage4_samples():
                 implicit_skills=skills.implicit_skills,
                 archetype=arch,
             )
+            if arch == "product":
+                product_res = res
+
             b = res.breakdown
             print(
                 f"  • [{arch.upper():<11}] Tổng: {res.total_score:>5}/100 ({res.match_level:<15}) | "
                 f"Cấu trúc: {b['section_completeness']} | Kỹ năng: {b['skill_coverage']} | "
                 f"Impact: {b['impact_and_metrics']} | Trình bày: {b['presentation_and_links']}"
             )
+
+        # Hiển thị Skill Gap của mô hình Product
+        if product_res and product_res.missing_skills:
+            gap_summary = [f"{cat}: {', '.join(sks)}" for cat, sks in product_res.missing_skills.items()]
+            print(f"  ⚠️ Skill Gap (Product)     : {' | '.join(gap_summary)}")
+        else:
+            print("  ⚠️ Skill Gap (Product)     : (Đã đạt kỳ vọng các nhóm kỹ năng)")
 
         # B. Chấm điểm khi truyền trực tiếp jd_text
         jd_res = evaluate_cv_ats(
@@ -70,8 +81,10 @@ def test_stage4_samples():
         missing_flat = [s for lst in jd_res.missing_skills.values() for s in lst]
         print(f"  • [CUSTOM JD  ] Tổng: {jd_res.total_score:>5}/100 | Thiếu so với JD: {', '.join(missing_flat) or 'Đủ 100%'}")
 
-        if jd_res.unlisted_Project_skills:
-            print(f"  🔍 Kỹ năng ẩn (quên ghi ở mục Skills): {', '.join(jd_res.unlisted_Project_skills)}")
+        if jd_res.unlisted_project_skills:
+            print(f"  🔍 Kỹ năng ẩn (quên ghi ở mục Skills): {', '.join(jd_res.unlisted_project_skills)}")
+
+    print("\n" + "=" * 75)
 
 if __name__ == "__main__":
     test_stage4_samples()
