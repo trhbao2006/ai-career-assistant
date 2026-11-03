@@ -70,10 +70,7 @@ class ArchitectureAdviceResult(BaseModel):
     )
 
 
-# =====================================================================
 # SYSTEM PROMPT CHO GEMINI
-# =====================================================================
-
 SYSTEM_PROMPT_ARCH_ADVISOR = """
 Bạn là một Principal Backend Architect và Tech Lead dày dặn kinh nghiệm, chuyên hướng dẫn các kỹ sư Backend Intern/Fresher nâng cấp đồ án cá nhân để vượt qua các kỳ tuyển dụng khắt khe.
 Nhiệm vụ của bạn là phân tích nội dung các dự án trong CV của ứng viên, đối chiếu với danh sách các kỹ năng còn thiếu (Skill Gap) và mô hình công ty mục tiêu để đưa ra các đề xuất nâng cấp kiến trúc THỰC CHIẾN và KHẢ THI.
@@ -98,9 +95,23 @@ class LLMAdvisor:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "gemini-2.5-flash",
+        model_name: str = "gemini-flash-lite-latest",
     ):
+        # 1. Đọc key từ tham số, biến môi trường hoặc file .env
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        if not self.api_key:
+            env_path = os.path.join(os.getcwd(), ".env")
+            if os.path.exists(env_path):
+                try:
+                    with open(env_path, "r", encoding="utf-8") as f:
+                        for line in f:
+                            clean_line = line.strip()
+                            if clean_line.startswith("GEMINI_API_KEY="):
+                                self.api_key = clean_line.split("=", 1)[1].strip().strip('"').strip("'")
+                                break
+                except Exception:
+                    pass
+
         self.model_name = model_name
         self.client = None
 
@@ -162,7 +173,23 @@ class LLMAdvisor:
                 if response.parsed:
                     return response.parsed
             except Exception:
-                pass
+                # Dự phòng tự động chuyển sang các model khả dụng khác nếu model chính gặp lỗi
+                for fb_model in ["gemini-flash-latest", "gemini-3.8-flash"]:
+                    try:
+                        response = self.client.models.generate_content(
+                            model=fb_model,
+                            contents=prompt,
+                            config=types.GenerateContentConfig(
+                                system_instruction=SYSTEM_PROMPT_ARCH_ADVISOR,
+                                response_mime_type="application/json",
+                                response_schema=ArchitectureAdviceResult,
+                                temperature=0.3,
+                            ),
+                        )
+                        if response.parsed:
+                            return response.parsed
+                    except Exception:
+                        continue
 
         # Fallback Offline chất lượng cao dựa trên missing_skills và rule-based template
         return self._fallback_architecture_advice(projects_text, missing_skills, archetype)

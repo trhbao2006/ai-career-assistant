@@ -53,13 +53,14 @@ Bản tóm tắt toàn bộ kiến trúc, quyết định kỹ thuật và trạ
   2. **Before vs. After Project Rewrite (`ProjectBulletRewrite`)**: Viết lại mô tả dự án theo chuẩn công thức Google XYZ (Action Verb + Nhiệm vụ kỹ thuật + Số liệu đo lường) để ứng viên copy thẳng vào CV.
   3. **Deterministic Fallback Engine**: Tự động chuyển sang chế độ offline thông minh khi không có API key hoặc mất mạng.
 
-### `tests/` (Bộ kiểm thử tự động)
-- `test_intake.py`: Kiểm thử Chặng 1.
-- `test_section_parser.py`: Kiểm thử Chặng 2.
-- `test_skills_extractor.py`: Kiểm thử Chặng 3.
-- `test_ats_scorer.py`: Kiểm thử Chặng 4 (3 Archetypes + Custom JD).
-- `test_llm_advisor.py`: Kiểm thử Chặng 5 (Toàn bộ chuỗi Pipeline Chặng 1 $\rightarrow$ 5).
-- `test_resume_schema.py`: Kiểm thử Tầng chuẩn hóa JSON Resume & Markdown.
+### `tests/` (Bộ kiểm thử tự động & Báo cáo Bảng ASCII)
+- `test_utils.py`: Tiện ích tự động quét tất cả file PDF trong `tests/CV Test/` hoặc `tests/` và render bảng ASCII đẹp mắt.
+- `test_intake.py`: Bảng kiểm thử Chặng 1 (Trạng thái, Số trang, Số ký tự, Preview).
+- `test_section_parser.py`: Bảng ma trận kiểm thử Chặng 2 (Tỷ lệ bóc tách 7 sections trên toàn bộ CV).
+- `test_skills_extractor.py`: Bảng kiểm thử Chặng 3 (Thống kê 5 nhóm taxonomy, Explicit vs. Implicit skills).
+- `test_ats_scorer.py`: Bảng điểm ATS 4 trụ cột và so sánh đa mô hình (Product, Outsourcing, Startup, Custom JD).
+- `test_resume_schema.py`: Bảng kiểm thử Tầng trung gian (Email, Phone, Links, JSON Resume, Structured Markdown).
+- `test_llm_advisor.py`: Bảng kiểm thử Chặng 5 (Đề xuất kiến trúc & So sánh Before vs. After theo chuẩn Google XYZ).
 - Đã cấu hình UTF-8 console output chạy mượt mà trên Windows PowerShell/CMD.
 
 ---

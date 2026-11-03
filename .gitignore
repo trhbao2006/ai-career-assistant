@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 .env
 test/sample_cv.pdf
+tests/
+.vscode/
