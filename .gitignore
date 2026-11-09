@@ -1,7 +1,17 @@
+# Môi trường ảo & cấu hình cục bộ
 venv/
+.env
+.vscode/
+
+# Python Cache
 __pycache__/
 *.pyc
-.env
+
+# Bỏ qua toàn bộ file PDF và dữ liệu CV mẫu trong tests
+*.pdf
+tests/sample*
+tests/**/sample*
+tests/backend/
+tests/CV Test/
+tests/output/
 test/sample_cv.pdf
-tests/
-.vscode/
