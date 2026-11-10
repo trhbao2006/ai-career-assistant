@@ -16,20 +16,26 @@ Bản tóm tắt toàn bộ kiến trúc, quyết định kỹ thuật và trạ
 
 ## 2. Cấu trúc Thư mục & Trạng thái các Module
 
-### `config/backend.py` (Đã hoàn thành & tối ưu)
-- `backend_skills_taxonomy` (alias `backend_skills_tamoxy`): Từ điển 3 tầng phân loại kỹ năng Backend gồm 5 nhóm (`languages`, `frameworks`, `databases`, `devops_tools`, `concepts`). Đã bổ sung `AWS`, `Nginx`, `System Design`, `Agile/Scrum`, `Authentication (JWT/OAuth)`.
-- `COMPANY_ARCHETYPES`: Bảng trọng số chấm điểm theo 3 mô hình công ty.
+### `config/backend.py` (Đã mở rộng toàn diện & Tối ưu)
+- `backend_skills_taxonomy` (alias `backend_skills_tamoxy`): Từ điển phân loại kỹ năng Backend mở rộng gồm 9 nhóm chuyên môn (`languages`, `frameworks`, `databases`, `devops_tools`, `cloud`, `messaging`, `observability`, `security`, `concepts`).
+- Đã bổ sung đầy đủ: PHP/Laravel, Go Web Frameworks (Gin/Echo/Fiber), Ruby on Rails, Kotlin, Rust, Hibernate/JPA, MyBatis, Oracle, MariaDB, Firebase/Supabase, Payment Gateways (VNPAY/MoMo/ZaloPay), Database Design & Optimization.
+- Đã làm sạch các alias dễ gây nhiễu/bắt nhầm (`aws lambda`, `solid principles`, `server log`).
+- `COMPANY_ARCHETYPES`: Bảng trọng số chấm điểm đa mô hình (Product, Outsourcing, Startup) với 9 nhóm kỹ năng (tổng trọng số chuẩn hóa = 1.0 kèm assertion).
 - `ARCHETYPE_CORE_SKILLS`: Danh sách kỹ năng cốt lõi cho từng archetype.
-- `ACTION_VERBS`: Danh sách động từ hành động kỹ thuật song ngữ Anh - Việt.
+- `ACTION_VERBS`: Danh sách động từ hành động kỹ thuật mở rộng song ngữ Anh - Việt.
 
-### `core/intake.py` (Chặng 1 — Hoàn thành)
-- Sử dụng `pymupdf` đọc PDF theo khối tọa độ (`page.get_text("blocks")`), chia tách 2 cột (`split_x = page.rect.width * 0.38`), sắp xếp theo trục dọc `y0` chống dính dòng ngang trên CV 2 cột TopCV/Canva.
+### `core/intake.py` (Chặng 1 — Hoàn thành & Tối ưu)
+- Sử dụng `pymupdf` đọc PDF theo khối tọa độ (`page.get_text("blocks")`).
+- **Adaptive Column Detection (`is_two_column_layout`)**: Nhận diện động CV 1 cột (đọc tuần tự tự nhiên) vs CV 2 cột (TopCV, Canva).
+- **Full-width Header Preservation**: Tự động nhận diện và bảo toàn khối Header/Banner trải rộng toàn trang ở đầu CV trước khi phân chia cột, chống lỗi đảo lộn tên và thông tin liên hệ.
 - Chuẩn hóa Unicode NFKC, xóa ký tự ẩn, chuyển đổi icon TopCV/Canva thành bullet `-`.
 - Guardrails: Giới hạn 1–5 trang, tối thiểu 100 ký tự.
 
-### `core/section_parser.py` (Chặng 2 — Hoàn thành)
+### `core/section_parser.py` (Chặng 2 — Hoàn thành & Tối ưu)
 - Máy trạng thái hữu hạn (FSM) phân tách CV thành 7 nhóm: `contact`, `summary`, `education`, `skills`, `experience`, `projects`, `others`.
 - Kỹ thuật **Condensed Normalization**: Xóa toàn bộ khoảng trắng và dấu câu trang trí trước khi so khớp từ khóa, xử lý triệt để lỗi kerning dãn chữ / vỡ font tiếng Việt của TopCV.
+- **False Positive Guard**: Bộ lọc thông minh chặn bắt nhầm câu văn nội dung thành đề mục (chặn các liên từ/giới từ thông thường `STOP_WORDS_IN_HEADER`, giới hạn số từ $\le 6$, chặn dấu phẩy `,` và câu có dấu chấm kết thúc).
+- Khớp chính xác từ khóa hoặc chỉ cho phép hậu tố số/La Mã hợp lệ (`duan1`, `projects i`).
 
 ### `core/skills_extractor.py` (Chặng 3 — Hoàn thành)
 - Pre-compiled Regex Negative Lookaround an toàn cho các từ khóa đặc biệt (`C++`, `C#`, `.NET`, `Java` không trùng `JavaScript`).
@@ -38,14 +44,15 @@ Bản tóm tắt toàn bộ kiến trúc, quyết định kỹ thuật và trạ
 ### `core/ats_scorer.py` (Chặng 4 — Đã hoàn thành & Tối ưu)
 - Chấm điểm định lượng thang 100 qua 4 trụ cột:
   1. **Section Completeness (20đ)**: 4 mục cơ bản contact, education, skills, exp/projects.
-  2. **Skill Coverage & Skill Gap (40đ)**: Tính độ phủ theo trọng số archetype hoặc JD; logic thông minh cho nhóm ngôn ngữ (không ép buộc học cả 4 thứ tiếng nếu đã vững 1 ngôn ngữ cốt lõi).
+  2. **Skill Coverage & Skill Gap (40đ)**: Tính độ phủ theo trọng số archetype hoặc JD; logic thông minh cho nhóm ngôn ngữ (không ép buộc học cả 4 thứ tiếng nếu đã vững 1 ngôn ngữ cốt lõi). Xử lý an toàn Custom JD khi ít từ khóa nhận diện, tự động fallback về Archetype kèm cảnh báo minh bạch.
   3. **Impact & Metrics (25đ)**: Quét regex tìm số liệu định lượng (`%`, `ms`, `req/ngày`, `users`, `x`) và đếm `ACTION_VERBS`.
   4. **Presentation & Consistency (15đ)**: Quét link GitHub/GitLab/LinkedIn ở contact, summary và projects; trừ điểm nếu để kỹ năng thực tế bị trôi dạt (Implicit skills).
 - Trả về DTO `ATSScoreResult` kèm phân hạng (`Excellent` / `Good` / `Low Match`) và `actionable_feedback`.
 
-### `core/resume_schema.py` (Tầng Chuẩn hóa Trung gian — Hoàn thành)
-- **JSON Resume Standard (`build_structured_resume`)**: Chuẩn hóa toàn bộ dữ liệu bóc tách của CV theo schema chuẩn quốc tế `jsonresume.org` (basics, education, skills, work, projects, ats_evaluation). Dễ dàng serialize lưu SQLite ở Chặng 6 và cho phép tải về `resume.json`.
-- **Structured Markdown (`build_markdown_resume`)**: Chuyển đổi CV sang văn bản Markdown sạch với cấu trúc phân cấp (#, ##, ###, bullets) phục vụ làm đầu vào tối ưu cho LLM Advisor ở Chặng 5 và xuất file `resume.md`.
+### `core/resume_schema.py` (Tầng Chuẩn hóa Trung gian — Hoàn thành & Tối ưu)
+- **Candidate Name Extraction (`extract_candidate_name`)**: Trích xuất họ tên ứng viên từ header/contact (hỗ trợ cả các mẫu test có token `[HỌ VÀ TÊN]`, `[FULL NAME]`).
+- **JSON Resume Standard (`build_structured_resume`)**: Chuẩn hóa toàn bộ dữ liệu bóc tách của CV theo schema chuẩn quốc tế `jsonresume.org` (basics kèm name, email, phone, links, education, skills, work, projects, ats_evaluation). Sẵn sàng serialize lưu SQLite ở Chặng 6 và cho phép tải về `resume.json`.
+- **Structured Markdown (`build_markdown_resume`)**: Chuyển đổi CV sang văn bản Markdown sạch với cấu trúc phân cấp (#, ##, ###, bullets) có tên ứng viên ở tiêu đề, phục vụ làm đầu vào tối ưu cho LLM Advisor ở Chặng 5 và xuất file `resume.md`.
 
 ### `core/llm_advisor.py` (Chặng 5 — Đã hoàn thành & Tinh gọn)
 - Sử dụng Google GenAI SDK (`from google import genai`) kết hợp Pydantic Schemas (`response_schema`) cho Structured Outputs:

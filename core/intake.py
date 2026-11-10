@@ -48,10 +48,29 @@ def clean_raw_text(raw_text: str) -> str:
     return text.strip()
 
 
+def is_two_column_layout(text_blocks: list, page_width: float) -> bool:
+    """
+    Kiểm tra xem trang có phân chia 2 cột rõ rệt hay không (Adaptive Column Detection).
+    Điều kiện: Có các khối nằm bên trái (< 45% page) và các khối nằm bên phải (> 35% page),
+    đồng thời cả hai bên đều có ít nhất 2 khối văn bản độc lập.
+    """
+    left_blocks = [
+        b for b in text_blocks 
+        if b[2] <= page_width * 0.45 and (b[2] - b[0]) < page_width * 0.5
+    ]
+    right_blocks = [
+        b for b in text_blocks 
+        if b[0] >= page_width * 0.35
+    ]
+    return len(left_blocks) >= 2 and len(right_blocks) >= 2
+
+
 def extract_text_by_columns(doc: pymupdf.Document) -> str:
     """
-    Trích xuất text theo từng cột độc lập (Block-based reading order),
-    chống dính dòng ngang giữa 2 cột của layout TopCV.
+    Trích xuất text thông minh:
+    - Nhận diện động Layout 1 cột vs 2 cột (Adaptive Column Detection).
+    - Bảo toàn các khối Header/Banner full-width ở đầu trang (Họ tên, Liên hệ).
+    - Đọc tuần tự cột trái -> cột phải đối với layout 2 cột chống dính dòng.
     """
     full_text_pages = []
 
@@ -64,20 +83,42 @@ def extract_text_by_columns(doc: pymupdf.Document) -> str:
         if not text_blocks:
             continue
 
-        # Trục chia 2 cột 
         page_width = page.rect.width
-        split_x = page_width * 0.38
 
-        left_col = [b for b in text_blocks if b[0] < split_x]
-        right_col = [b for b in text_blocks if b[0] >= split_x]
+        # TH1: Layout 1 cột (Đọc tự nhiên từ trên xuống dưới theo tọa độ y0)
+        if not is_two_column_layout(text_blocks, page_width):
+            text_blocks.sort(key=lambda b: (b[1], b[0]))
+            page_lines = []
+            for b in text_blocks:
+                for line in b[4].splitlines():
+                    line_str = line.strip()
+                    if line_str:
+                        page_lines.append(line_str)
+            full_text_pages.append("\n".join(page_lines))
+            continue
+
+        # TH2: Layout 2 cột (TopCV, Canva...)
+        # Tách các khối Header full-width ở đầu trang (chiều rộng khối > 60% page_width và ở 30% trên cùng)
+        top_header_cutoff = page.rect.height * 0.30
+        top_headers = [
+            b for b in text_blocks
+            if (b[2] - b[0]) > page_width * 0.60 and b[1] < top_header_cutoff
+        ]
+        top_headers.sort(key=lambda b: b[1])
+
+        remaining_blocks = [b for b in text_blocks if b not in top_headers]
+
+        split_x = page_width * 0.38
+        left_col = [b for b in remaining_blocks if b[0] < split_x]
+        right_col = [b for b in remaining_blocks if b[0] >= split_x]
 
         # Sắp xếp từng cột độc lập theo trục dọc (y0) từ trên xuống dưới
         left_col.sort(key=lambda b: b[1])
         right_col.sort(key=lambda b: b[1])
 
-        # Đọc trọn vẹn cột trái rồi sang cột phải
+        # Đọc Header trước -> Cột trái -> Cột phải
         page_lines = []
-        for b in left_col + right_col:
+        for b in top_headers + left_col + right_col:
             for line in b[4].splitlines():
                 line_str = line.strip()
                 if line_str:

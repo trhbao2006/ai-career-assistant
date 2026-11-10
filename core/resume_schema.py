@@ -5,8 +5,51 @@ from core.ats_scorer import ATSScoreResult
 from core.skills_extractor import SkillExtractionResult
 
 
+def extract_candidate_name(contact_text: str) -> str:
+    """
+    Trích xuất tên ứng viên từ khối liên hệ hoặc đầu CV.
+    Heuristic: Tìm dòng ngắn (2-5 từ), viết hoa hoặc Title Case, không chứa thông tin liên lạc/từ khóa kỹ thuật.
+    Hỗ trợ cả các CV mẫu kiểm thử có placeholder dạng [HỌ VÀ TÊN], [FULL NAME].
+    """
+    if not contact_text:
+        return ""
+
+    # Nhận diện placeholder template kiểm thử
+    placeholder_match = re.search(r"\[(HỌ VÀ TÊN|FULL NAME|YOUR NAME|TÊN ỨNG VIÊN|NAME)\]", contact_text, re.IGNORECASE)
+    if placeholder_match:
+        return placeholder_match.group(0)
+
+    ignored_keywords = [
+        "curriculum", "vitae", "resume", "cv", "email", "phone", "sđt",
+        "github", "linkedin", "contact", "thông tin", "liên hệ", "address",
+        "địa chỉ", "developer", "engineer", "backend", "fresher", "intern",
+        "objective", "mục tiêu", "nam", "nữ", "sinh ngày", "dob", "nơi ở",
+        "student", "sinh viên", "công ty", "vietnam", "việt nam"
+    ]
+
+    for line in contact_text.splitlines()[:6]:
+        line_clean = line.strip()
+        if not line_clean or len(line_clean) > 40:
+            continue
+
+        line_lower = line_clean.lower()
+        if any(kw in line_lower for kw in ignored_keywords):
+            continue
+        if re.search(r"[@\d:/\\.]", line_clean):
+            continue
+
+        words = [w for w in line_clean.split() if w]
+        if 2 <= len(words) <= 5:
+            # Kiểm tra xem có phải tên (tất cả các từ viết hoa chữ đầu hoặc viết hoa toàn bộ)
+            if all(w[0].isupper() for w in words):
+                return line_clean
+
+    return ""
+
+
 def extract_contact_info(contact_text: str) -> Dict[str, Any]:
-    """Trích xuất email, phone, link từ khối contact."""
+    """Trích xuất tên ứng viên, email, phone, link từ khối contact."""
+    name = extract_candidate_name(contact_text)
     email_match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", contact_text)
     phone_match = re.search(r"(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}|\b\d{9,11}\b", contact_text)
     
@@ -16,6 +59,7 @@ def extract_contact_info(contact_text: str) -> Dict[str, Any]:
         links.extend(matches)
 
     return {
+        "name": name,
         "email": email_match.group(0) if email_match else "",
         "phone": phone_match.group(0) if phone_match else "",
         "links": list(set(links)),
@@ -37,6 +81,7 @@ def build_structured_resume(
     resume_json: Dict[str, Any] = {
         "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
         "basics": {
+            "name": info["name"],
             "summary": sections.get("summary", ""),
             "email": info["email"],
             "phone": info["phone"],
@@ -80,7 +125,10 @@ def build_markdown_resume(
     md_lines = []
 
     # 1. Header & Liên hệ
-    md_lines.append("# SƠ YẾU LÝ LỊCH / CURRICULUM VITAE")
+    name = extract_candidate_name(sections.get("contact", ""))
+    title_header = f"# {name.upper()}" if name else "# SƠ YẾU LÝ LỊCH / CURRICULUM VITAE"
+    md_lines.append(title_header)
+
     contact = sections.get("contact", "").strip()
     if contact:
         md_lines.append(f"_{contact.replace(chr(10), ' | ')}_\n")

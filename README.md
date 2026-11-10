@@ -1,7 +1,6 @@
 # AI Career Assistant
 
-> **Hệ thống Hybrid AI phân tích CV, định lượng điểm ATS, tư vấn nâng cấp kiến trúc đồ án và tối ưu hóa mô tả dự án chuẩn Google XYZ dành cho Backend Developer (Intern/Fresher).**
-
+> **Hệ thống Hybrid AI phân tích CV, định lượng điểm ATS, tư vấn nâng cấp CV cho sinh viên CNTT.**
 ---
 
 ## 1. Giới thiệu Tổng quan
@@ -11,10 +10,10 @@ Trong thị trường tuyển dụng công nghệ hiện nay, hơn **70% CV củ
 - Mô tả dự án sơ sài, thiếu số liệu định lượng (Metrics), chỉ dừng lại ở CRUD cơ bản.
 - Không đồng bộ giữa kỹ năng tự khai báo và kỹ năng thực chiến làm trong dự án.
 
-**AI Career Assistant** được phát triển theo triết lý **Kiến trúc Hybrid (Kỹ thuật phần mềm truyền thống + Generative AI hiện đại)**:
-- **Chặng 1–4 (Deterministic Core):** Sử dụng Rule-based, Heuristics, Regex Negative Lookaround và Lý thuyết tập hợp toán học để đảm bảo tính **tất định 100%, tốc độ phản hồi cực nhanh (< 50ms), tốn 0 đồng chi phí API** và có khả năng giải trình minh bạch từng tiêu chí điểm.
+**AI Career Assistant** được phát triển theo **Kiến trúc Hybrid (Kỹ thuật phần mềm + Generative AI hiện đại)**:
+- **Deterministic Core:** Sử dụng Rule-based, Heuristics, Regex Negative Lookaround và Lý thuyết tập hợp toán học để đảm bảo tính **tất định 100%, tốc độ phản hồi cực nhanh, không tốn chi phí API** và có khả năng giải trình minh bạch từng tiêu chí.
 - **Tầng Chuẩn hóa Trung gian (IR Layer):** Đóng gói dữ liệu phi cấu trúc thành chuẩn quốc tế **JSON Resume (`jsonresume.org`)** và **Structured Markdown**.
-- **Chặng 5 (Generative AI Engine):** Tận dụng **Google Gemini API** (`google-genai` SDK) kết hợp **Pydantic v2 Structured Outputs** để đóng vai một Principal Backend Architect: phân tích điểm nghẽn hiệu năng của đồ án hiện tại, hướng dẫn cấy ghép công nghệ thiếu (Redis, Docker, CI/CD, Unit Testing) và viết lại từng gạch đầu dòng dự án theo công thức Google XYZ.
+- **Generative AI Engine:** Tận dụng **Google Gemini API** (`google-genai` SDK) kết hợp **Pydantic v2 Structured Outputs** để đóng vai một Principal Backend Architect: phân tích điểm nghẽn hiệu năng của đồ án hiện tại, hướng dẫn cấy ghép công nghệ thiếu (Redis, Docker, CI/CD, Unit Testing) và viết lại từng gạch đầu dòng dự án theo công thức Google XYZ.
 
 ---
 
@@ -67,7 +66,6 @@ Trong thị trường tuyển dụng công nghệ hiện nay, hơn **70% CV củ
 │ • 2. Viết lại Mô tả Dự án Before vs. After (Google XYZ Formula)        │
 └────────────────────────────────────────────────────────────────────────┘
 ```
-
 ---
 
 ## 3. Các Điểm Sáng Kỹ Thuật Từng Chặng
@@ -78,12 +76,12 @@ Trong thị trường tuyển dụng công nghệ hiện nay, hơn **70% CV củ
 - **Hàng rào bảo vệ (Guardrails):** Chặn file ngoài khoảng $1 - 5$ trang hoặc $< 100$ ký tự (loại trừ PDF ảnh scan).
 
 ### 🔹 Chặng 2: Bóc tách Cấu trúc CV FSM (`core/section_parser.py`)
-- **Kỹ thuật Condensed Normalization:** TopCV thường chèn khoảng trắng ngẫu nhiên vào tiêu đề (như `"HỌ C  V Ấ N"`, `"KỸ   N Ă NG"`). Hệ thống xóa sạch toàn bộ `\s\-_:•.()[]|/` và chuyển về chữ thường $\rightarrow$ tự động quy về dạng nén duy nhất (`"họcvấn"`, `"kỹnăng"`), trị dứt điểm lỗi vỡ font.
+- **Kỹ thuật Condensed Normalization:** Các trang hỗ trợ tạo CV thường chèn khoảng trắng ngẫu nhiên vào tiêu đề (như `"HỌ C  V Ấ N"`, `"KỸ   N Ă NG"`). Hệ thống xóa sạch toàn bộ `\s\-_:•.()[]|/` và chuyển về chữ thường $\rightarrow$ tự động quy về dạng nén duy nhất (`"họcvấn"`, `"kỹnăng"`), trị dứt điểm lỗi vỡ font.
 - **Bộ lọc Heuristics 4 tầng:** Lọc theo độ dài $\le 50$ ký tự, chặn câu văn có dấu chấm kết thúc `.` để tránh bắt nhầm câu văn thường thành tiêu đề.
 - **Máy trạng thái hữu hạn (FSM):** Bóc tách CV thành 7 vùng ngữ nghĩa chuẩn: `contact`, `summary`, `education`, `skills`, `experience`, `projects`, `others`.
 
 ### 🔹 Chặng 3: Trích xuất Kỹ năng Chuyên sâu (`core/skills_extractor.py`)
-- **Taxonomy Backend 3 tầng (`config/backend.py`):** Phân loại 38 kỹ năng Backend vào 5 nhóm: `languages`, `frameworks`, `databases`, `devops_tools`, `concepts`.
+- **Taxonomy Backend 3 tầng (`config/backend.py`):** Phân loại kỹ năng Backend vào 5 nhóm: `languages`, `frameworks`, `databases`, `devops_tools`, `concepts`.
 - **Pre-compiled Negative Lookaround Regex:**
   - Ký tự biên đặc biệt: Bắt chuẩn xác `.NET`, `C++`, `C#` bằng pattern `(?<![a-zA-Z0-9_]){escaped}(?![a-zA-Z0-9_+#])` mà không bị lỗi boundary `\b`.
   - Khử trùng lặp chuỗi con: Bắt `Java` mà không bắt nhầm `JavaScript` bằng pattern `\bjava\b(?!\s*script)`.
@@ -179,7 +177,7 @@ GEMINI_API_KEY=AIzaSy_mã_key_của_bạn_từ_Google_AI_Studio
 
 ---
 
-## 🧪 7. Chạy Bộ Kiểm thử Báo cáo (ASCII Dashboard)
+## 🧪 7. Chạy Bộ Kiểm thử Báo cáo 
 
 Hệ thống được tích hợp bộ xuất bảng báo cáo trực quan. Bạn có thể chạy kiểm thử từng chặng hoặc chạy toàn bộ:
 

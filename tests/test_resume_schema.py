@@ -17,13 +17,14 @@ def test_resume_standardization():
     headers = [
         "STT",
         "Tên File CV",
+        "Họ Tên Ứng viên",
         "Email Trích xuất",
         "Số Điện thoại",
         "Profile Links",
         "Độ dài MD",
         "JSON Resume",
     ]
-    alignments = ["center", "left", "left", "center", "left", "right", "center"]
+    alignments = ["center", "left", "left", "left", "center", "left", "right", "center"]
     rows = []
 
     out_dir = Path("tests/output")
@@ -50,6 +51,7 @@ def test_resume_standardization():
         md_content = build_markdown_resume(sections, skills, ats_res.missing_skills)
 
         basics = json_resume.get("basics", {})
+        name = basics.get("name") or "—"
         email = basics.get("email") or "—"
         phone = basics.get("phone") or "—"
         profiles = [p["url"] for p in basics.get("profiles", [])]
@@ -57,8 +59,9 @@ def test_resume_standardization():
 
         rows.append([
             str(idx),
-            truncate_text(pdf_path.name, 30),
-            truncate_text(email, 28),
+            truncate_text(pdf_path.name, 28),
+            truncate_text(name, 20),
+            truncate_text(email, 26),
             phone,
             profiles_str,
             f"{len(md_content):,} ký tự",

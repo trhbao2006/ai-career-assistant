@@ -68,10 +68,18 @@ def score_skill_coverage(
 
     # Nếu người dùng có upload thêm JD, bóc tách kỹ năng từ JD
     jd_skills = extract_skills(jd_text) if jd_text else {}
+    jd_total_skills = sum(len(skills) for skills in jd_skills.values()) if jd_skills else 0
+    use_jd_mode = bool(jd_text and jd_total_skills >= 2)
 
     score = 0.0
     missing_skills: Dict[str, List[str]] = {}
     feedback = []
+
+    if jd_text and not use_jd_mode:
+        feedback.append(
+            f"Văn bản JD cung cấp chỉ nhận diện được {jd_total_skills} kỹ năng Backend cốt lõi. "
+            f"Hệ thống tự động đối chiếu theo tiêu chuẩn mô hình {archetype.title()} để đảm bảo khách quan."
+        )
 
     # Số lượng kỹ năng kỳ vọng đạt điểm tối đa ở mỗi nhóm đối với Fresher/Intern
     TARGET_COUNT = {
@@ -80,15 +88,19 @@ def score_skill_coverage(
         "databases": 2,
         "devops_tools": 2,
         "concepts": 2,
+        "cloud": 1,
+        "messaging": 1,
+        "observability": 1,
+        "security": 1,
     }
 
     for category, weight in weights.items():
         found_set = set(all_found_skills.get(category, []))
 
-        # TH1: Có JD text và JD yêu cầu kỹ năng ở nhóm này
-        if jd_text and jd_skills.get(category):
+        # TH1: Có JD text hợp lệ và JD có yêu cầu kỹ năng ở nhóm này
+        if use_jd_mode and jd_skills.get(category):
             target_set = set(jd_skills[category])
-            expected_num = len(target_set)
+            expected_num = max(len(target_set), 1)
             missing = sorted(list(target_set - found_set))
             if missing:
                 missing_skills[category] = missing
@@ -96,34 +108,41 @@ def score_skill_coverage(
         # TH2: Chấm theo Archetype chuẩn (hoặc nhóm không có trong JD)
         else:
             target_set = set(core_reqs.get(category, []))
-            expected_num = TARGET_COUNT.get(category, 2)
 
-            if category == "languages":
-                # Đối với Fresher/Intern, không ép buộc phải biết toàn bộ các ngôn ngữ khác nhau
-                core_matched = found_set & target_set
-                if not core_matched:
-                    # Chưa có ngôn ngữ cốt lõi nào trong định hướng archetype
-                    missing_skills[category] = sorted(list(target_set))
-                elif len(found_set) < expected_num:
-                    # Đã có 1 ngôn ngữ core nhưng chưa đủ chỉ tiêu kỳ vọng (ví dụ cần 2)
-                    remaining = sorted(list(target_set - found_set))
-                    if remaining:
-                        missing_skills[category] = remaining[:2]
+            if target_set:
+                expected_num = min(len(target_set), TARGET_COUNT.get(category, 2))
+
+                if category == "languages":
+                    # Đối với Fresher/Intern, không ép buộc phải biết toàn bộ các ngôn ngữ khác nhau
+                    core_matched = found_set & target_set
+                    if not core_matched:
+                        # Chưa có ngôn ngữ cốt lõi nào trong định hướng archetype
+                        missing_skills[category] = sorted(list(target_set))
+                    elif len(found_set) < expected_num:
+                        # Đã có 1 ngôn ngữ core nhưng chưa đủ chỉ tiêu kỳ vọng (ví dụ cần 2)
+                        remaining = sorted(list(target_set - found_set))
+                        if remaining:
+                            missing_skills[category] = remaining[:2]
+                else:
+                    # Các nhóm khác: nếu chưa đạt đủ số lượng kỳ vọng, cảnh báo các core skills còn thiếu
+                    missing = sorted(list(target_set - found_set))
+                    if missing and len(found_set) < expected_num:
+                        missing_skills[category] = missing
             else:
-                # Các nhóm khác: nếu chưa đạt đủ số lượng kỳ vọng, cảnh báo các core skills còn thiếu
-                missing = sorted(list(target_set - found_set))
-                if missing and len(found_set) < expected_num:
-                    missing_skills[category] = missing
+                # Nhóm này không bắt buộc trong Archetype cốt lõi (ví dụ messaging/security ở Outsourcing)
+                # Ứng viên không bị trừ điểm oan
+                expected_num = 0
 
         # Tính tỷ lệ phủ kỹ năng của nhóm này
         if expected_num > 0:
             ratio = min(len(found_set) / expected_num, 1.0)
         else:
+            # Nhóm không bắt buộc: mặc định đạt tỷ lệ tối đa
             ratio = 1.0
 
         score += 40.0 * weight * ratio
 
-        if ratio < 0.5:
+        if expected_num > 0 and ratio < 0.5:
             feedback.append(
                 f"Nhóm kỹ năng [{category}] đang thiếu hụt cho hướng {archetype.title()} "
                 f"(Mới có {len(found_set)}/{expected_num} kỹ năng kỳ vọng)."

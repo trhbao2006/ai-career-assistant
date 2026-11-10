@@ -10,20 +10,28 @@ def test_stage3_samples():
         print("❌ Không tìm thấy file PDF nào!")
         return
 
-    # Bảng 1: Thống kê số lượng kỹ năng theo 5 nhóm taxonomy
+    # Bảng 1: Thống kê số lượng kỹ năng theo 9 nhóm taxonomy
     headers_stats = [
         "STT",
         "Tên File CV",
-        "Languages",
-        "Frameworks",
-        "Databases",
+        "Lang",
+        "Framework",
+        "DB",
         "DevOps",
+        "Cloud",
+        "Msg",
+        "Obs",
+        "Sec",
         "Concepts",
         "Explicit",
         "Implicit 🔍",
-        "Tổng kỹ năng",
+        "Tổng",
     ]
-    alignments_stats = ["center", "left", "center", "center", "center", "center", "center", "center", "center", "center"]
+    alignments_stats = [
+        "center", "left", "center", "center", "center", "center",
+        "center", "center", "center", "center", "center", "center",
+        "center", "center"
+    ]
     rows_stats = []
 
     # Bảng 2: Chi tiết các kỹ năng ẩn phát hiện trong dự án
@@ -51,11 +59,15 @@ def test_stage3_samples():
 
         rows_stats.append([
             str(idx),
-            truncate_text(pdf_path.name, 32),
+            truncate_text(pdf_path.name, 26),
             str(len(res.all_found_skills.get("languages", []))),
             str(len(res.all_found_skills.get("frameworks", []))),
             str(len(res.all_found_skills.get("databases", []))),
             str(len(res.all_found_skills.get("devops_tools", []))),
+            str(len(res.all_found_skills.get("cloud", []))),
+            str(len(res.all_found_skills.get("messaging", []))),
+            str(len(res.all_found_skills.get("observability", []))),
+            str(len(res.all_found_skills.get("security", []))),
             str(len(res.all_found_skills.get("concepts", []))),
             str(explicit_count),
             f"🔍 {implicit_count}" if implicit_count > 0 else "0",
@@ -63,20 +75,20 @@ def test_stage3_samples():
         ])
 
         # Chi tiết kỹ năng
-        exp_flat = [s for sks in res.explicit_skills.values() for s in sks]
-        imp_flat = [s for sks in res.implicit_skills.values() for s in sks]
+        exp_flat = [s for lst in res.explicit_skills.values() for s in lst]
+        imp_flat = [s for lst in res.implicit_skills.values() for s in lst]
 
         rows_implicit.append([
             str(idx),
-            truncate_text(pdf_path.name, 28),
+            truncate_text(pdf_path.name, 26),
             truncate_text(", ".join(exp_flat), 45) if exp_flat else "(Không có mục Skills)",
-            truncate_text(", ".join(imp_flat), 40) if imp_flat else "(Không có kỹ năng ẩn mới)",
+            truncate_text(", ".join(imp_flat), 42) if imp_flat else "(Không có kỹ năng ẩn mới)",
         ])
 
     render_table(
         headers=headers_stats,
         rows=rows_stats,
-        title="KẾT QUẢ KIỂM THỬ CHẶNG 3: BÓC TÁCH KỸ NĂNG THEO TAXONOMY (5 NHÓM)",
+        title="KẾT QUẢ KIỂM THỬ CHẶNG 3: BÓC TÁCH KỸ NĂNG THEO TAXONOMY (9 NHÓM MỞ RỘNG)",
         alignments=alignments_stats,
     )
 
@@ -87,7 +99,8 @@ def test_stage3_samples():
         alignments=alignments_implicit,
     )
 
-    print(f"📊 Tổng kết: Phát hiện trung bình {round((total_explicit_all + total_implicit_all)/len(cv_files), 1)} kỹ năng/CV")
+    avg_skills = round(total_explicit_all + total_implicit_all) / len(cv_files)
+    print(f"📊 Tổng kết: Phát hiện trung bình {avg_skills:.1f} kỹ năng/CV")
     print(f"   (Tổng Explicit: {total_explicit_all} | Tổng Implicit phát hiện thêm từ dự án: {total_implicit_all})\n")
 
 
