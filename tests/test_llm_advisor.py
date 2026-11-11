@@ -1,3 +1,5 @@
+import os
+import pytest
 from core.intake import extract_cv
 from core.section_parser import parse_cv_sections
 from core.skills_extractor import analyze_cv_skills
@@ -7,6 +9,10 @@ from core.llm_advisor import LLMAdvisor
 from tests.test_utils import get_test_cvs, render_table, truncate_text
 
 
+@pytest.mark.skipif(
+    os.getenv("RUN_LIVE_LLM_TEST") != "true",
+    reason="Bỏ qua gọi live Gemini API khi chạy pytest hàng loạt. Chạy riêng bằng: python -m tests.test_llm_advisor"
+)
 def test_stage5_samples():
     cv_files = get_test_cvs()
     if not cv_files:
