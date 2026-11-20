@@ -36,11 +36,14 @@ SECTION_KEYWORDS = {
     "experience": [
         "kinhnghiem", "kinhnghiệm", "experience", "workexperience", 
         "employment", "lichsulaviec", "kinhnghiemlamviec", "kinhnghiệmlàmviệc",
-        "professionalexperience"
+        "professionalexperience", "workhistory", "practicalexperience",
+        "kinhnghiemduan", "kinhnghiệmdựán"
     ],
     "projects": [
         "duan", "dựán", "doan", "đồán", "projects", "personalprojects", 
-        "hoatdong", "hoạtđộng", "duancanhan", "dựáncánhân", "academicprojects"
+        "hoatdong", "hoạtđộng", "duancanhan", "dựáncánhân", "academicprojects",
+        "duanhoctap", "dựánhọctập", "projectsexperience", "experienceprojects",
+        "duanvakinhnghiem", "dựánvàkinhnghiệm", "duankinhnghiem", "dựánkinhnghiệm"
     ],
     "others": [
         "chungchi", "chứngchỉ", "certificates", "certifications", 
@@ -80,7 +83,7 @@ def detect_section_header(line: str) -> Optional[str]:
     clean_line = re.sub(r"^(\d+(\.\d+)*|[IVXLCDMivxlcdm]+|[A-Za-z])[\.\)\-:]\s*", "", clean_line)
 
     # 5. Gom lại dạng condensed: xóa toàn bộ khoảng trắng và dấu gạch để chống lỗi font
-    condensed = re.sub(r"[\s\-_:•\.\(\)\[\]\|/]+", "", clean_line).lower()
+    condensed = re.sub(r"[\s\-_:•\.\(\)\[\]\|/&]+", "", clean_line).lower()
 
     if len(condensed) > 30 or len(condensed) < 3:
         return None

@@ -79,16 +79,14 @@ backend_skills_tamoxy: Dict[str, Dict[str, List[str]]] = {
         "Helm": ["helm"],
         "Maven/Gradle": ["maven", "gradle"],
     },
-    # ------------------------------------------------------------------ #
-    # NHÁNH MỚI: Cloud (tách AWS khỏi devops_tools, thêm GCP/Azure/cloud nội địa)
+    #Cloud (tách AWS khỏi devops_tools, thêm GCP/Azure/cloud nội địa)
     "cloud": {
         "AWS": ["aws", "amazon web services", "ec2", "s3", "aws lambda", "rds", "ecs", "eks"],
         "GCP": ["gcp", "google cloud", "google cloud platform"],
         "Azure": ["azure", "microsoft azure"],
         "Cloud VN": ["viettel cloud", "fpt cloud", "vnpt cloud", "vng cloud", "cmc cloud"],
     },
-    # ------------------------------------------------------------------ #
-    # NHÁNH MỚI: Message Queue / Streaming (tách Kafka, RabbitMQ ra khỏi devops_tools)
+    #  NHÁNH MỚI: Message Queue / Streaming (tách Kafka, RabbitMQ ra khỏi devops_tools)
     "messaging": {
         "Kafka": ["kafka", "apache kafka"],
         "RabbitMQ": ["rabbitmq", "rabbit mq"],

@@ -1,6 +1,6 @@
 import re
-from typing import Dict, List, Set
-from config.backend import backend_skills_tamoxy
+from typing import Dict, List, Optional, Set
+from config.taxonomies.backend import backend_skills_tamoxy
 from dataclasses import dataclass
 
 def build_regex_pattern(alias: str) -> re.Pattern:
@@ -54,6 +54,7 @@ class SkillExtractionResult:
     explicit_skills: Dict[str, List[str]]   # Kỹ năng khai báo ở mục Skills
     implicit_skills: Dict[str, List[str]]   # Kỹ năng tìm thấy trong Projects/Experience nhưng không có ở Skills
     all_found_skills: Dict[str, List[str]]  # Hợp của cả 2 nhóm trên
+    project_skills: Optional[Dict[str, List[str]]] = None  # Toàn bộ kỹ năng thực chiến trong Projects/Experience
 
 
 def analyze_cv_skills(sections: Dict[str, str]) -> SkillExtractionResult:
@@ -91,6 +92,7 @@ def analyze_cv_skills(sections: Dict[str, str]) -> SkillExtractionResult:
         explicit_skills=explicit_skills,
         implicit_skills=implicit_skills,
         all_found_skills=all_found_skills,
+        project_skills=project_skills,
     )
 
 if __name__ == "__main__":

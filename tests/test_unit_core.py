@@ -1,5 +1,5 @@
 import pytest
-from config.backend import (
+from config.taxonomies.backend import (
     COMPANY_ARCHETYPES,
     ARCHETYPE_CORE_SKILLS,
     backend_skills_taxonomy,
@@ -223,3 +223,68 @@ LinkedIn: https://linkedin.com/in/nguyenvana
     md_content = build_markdown_resume(mock_sections, skills_res)
     assert "# NGUYỄN VĂN A" in md_content
     assert "Technical Skills" in md_content
+
+
+# =====================================================================
+# 7. KIỂM THỬ CÁC QUY TẮC BIÊN MỚI (EDGE CASES)
+# =====================================================================
+
+def test_ats_anti_keyword_stuffing():
+    """Kiểm tra cơ chế hạ trọng số khi kỹ năng chỉ ghi ở mục Skills mà không có trong Đồ án."""
+    # Ứng viên liệt kê nhiều database nhưng trong đồ án chỉ làm PostgreSQL
+    all_found = {"databases": ["PostgreSQL", "MongoDB", "Redis"]}
+    project_skills_verified = {"databases": ["PostgreSQL"]}
+
+    score_stuffed, _, fb = score_skill_coverage(
+        all_found_skills=all_found,
+        archetype="product",
+        project_skills=project_skills_verified,
+    )
+
+    # Đã có cảnh báo Keyword Stuffing
+    assert any("Keyword Stuffing" in msg for msg in fb)
+
+
+def test_ats_anti_boilerplate_essay():
+    """Kiểm tra chống câu văn sáo rỗng: viết dài (>300 ký tự) nhưng 0 thuật ngữ kỹ thuật Backend."""
+    fluff_sections = {
+        "experience": (
+            "Tôi là một người rất chăm chỉ và có tinh thần trách nhiệm cao trong công việc. "
+            "Tôi luôn cố gắng học hỏi mỗi ngày để hoàn thiện bản thân và cống hiến cho công ty. "
+            "Kỹ năng giao tiếp và làm việc nhóm của tôi rất tốt, tôi có thể hòa nhập nhanh chóng "
+            "với môi trường mới và các đồng nghiệp xung quanh trong mọi tình huống."
+        ),
+        "projects": "",
+    }
+    score, feedback = score_impact_and_metrics(fluff_sections)
+    # Bị phạt vì sáo rỗng, chỉ được 5 điểm ở phần chi tiết
+    assert any("sáo rỗng" in fb for fb in feedback)
+    assert score <= 12.0  # Không được điểm tối đa
+
+
+def test_ats_link_validation_and_placeholders():
+    """Kiểm tra nhận diện link placeholder vs link ẩn danh vs link thật."""
+    from core.ats_scorer import check_profile_link
+
+    # 1. Link placeholder dạng mẫu
+    score_p, fb_p = check_profile_link("GitHub: https://github.com/your-username")
+    assert score_p == 2.5
+    assert "placeholder" in fb_p.lower()
+
+    # 2. Link ẩn danh thường gặp trong CV mẫu
+    score_a, fb_a = check_profile_link("Thông tin liên hệ: [GitHub / Portfolio Link]")
+    assert score_a == 3.5
+    assert "ẩn danh" in fb_a.lower()
+
+    # 3. Không có link
+    score_empty, fb_empty = check_profile_link("Nguyen Van A - 0987654321")
+    assert score_empty == 0.0
+
+
+def test_merged_projects_experience_alias():
+    """Kiểm tra nhận diện alias gộp Projects & Experience trên CV 1 trang."""
+    from core.section_parser import detect_section_header
+    assert detect_section_header("PROJECTS & EXPERIENCE") == "projects"
+    assert detect_section_header("Dự án & Kinh nghiệm") == "projects"
+    assert detect_section_header("Work History") == "experience"
+

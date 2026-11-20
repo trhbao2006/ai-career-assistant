@@ -3,15 +3,16 @@ venv/
 .env
 .vscode/
 
-# Python Cache
+# Python & Test Cache
 __pycache__/
 *.pyc
+.pytest_cache/
 
-# Bỏ qua toàn bộ file PDF và dữ liệu CV mẫu trong tests
+# Dữ liệu CV, Dataset lớn & Output kiểm thử
 *.pdf
+dataset/
+Resume Dataset/
 tests/sample*
 tests/**/sample*
-tests/backend/
 tests/CV Test/
 tests/output/
-test/sample_cv.pdf
